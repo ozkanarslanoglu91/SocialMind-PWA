@@ -1,0 +1,63 @@
+{
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    "files.exclude": {
+        "**/bin": true,
+        "**/obj": true,
+        "**/.vs": true
+    },
+    "files.watcherExclude": {
+        "**/bin/**": true,
+        "**/obj/**": true,
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true
+    },
+    "search.exclude": {
+        "**/bin": true,
+        "**/obj": true,
+        "**/node_modules": true,
+        "**/.git": true
+    },
+    // C# Settings
+    "csharp.format.enable": true,
+    "csharp.suppressDotnetRestoreNotification": false,
+    "dotnet.defaultSolution": "SocialMind.sln",
+    // MAUI Settings
+    "dotnet-maui.projectDirectory": "${workspaceFolder}/SocialMind/SocialMind",
+    // Docker Settings
+    "docker.dockerPath": "docker",
+    "docker.showStartPage": false,
+    // Git Settings
+    "git.enableSmartCommit": true,
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    // Terminal
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.env.windows": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+    },
+    // GitHub Copilot
+    "github.copilot.enable": {
+        "*": true,
+        "yaml": true,
+        "plaintext": false,
+        "markdown": true,
+        "csharp": true,
+        "razor": true
+    },
+    // Files associations
+    "files.associations": {
+        "*.razor": "aspnetcorerazor",
+        "*.cshtml": "aspnetcorerazor"
+    },
+    // Blazor/Razor
+    "razor.format.enable": true,
+    // YAML
+    "yaml.schemas": {
+        "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
+    }
+}

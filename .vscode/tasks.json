@@ -1,0 +1,140 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SocialMind.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build-web",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SocialMind/SocialMind.Web/SocialMind.Web.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build-maui-windows",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/SocialMind/SocialMind/SocialMind.csproj",
+                "-f",
+                "net10.0-windows10.0.19041.0",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/SocialMind/SocialMind.Web/SocialMind.Web.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/SocialMind.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "restore",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "restore",
+                "${workspaceFolder}/SocialMind.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/SocialMind.sln"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "docker-build",
+            "type": "docker-build",
+            "dockerBuild": {
+                "context": "${workspaceFolder}",
+                "dockerfile": "${workspaceFolder}/Dockerfile",
+                "tag": "socialmind:latest"
+            }
+        },
+        {
+            "label": "docker-run: debug",
+            "type": "docker-run",
+            "dependsOn": [
+                "docker-build"
+            ],
+            "dockerRun": {
+                "containerName": "socialmind-debug",
+                "image": "socialmind:latest",
+                "env": {
+                    "ASPNETCORE_ENVIRONMENT": "Development"
+                },
+                "ports": [
+                    {
+                        "containerPort": 80,
+                        "hostPort": 5000
+                    }
+                ]
+            }
+        },
+        {
+            "label": "docker-compose-up",
+            "type": "shell",
+            "command": "docker-compose up -d",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "docker-compose-down",
+            "type": "shell",
+            "command": "docker-compose down",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
+}

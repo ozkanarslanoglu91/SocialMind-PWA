@@ -1,0 +1,67 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Web (Blazor)",
+            "type": "blazorwasm",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/SocialMind/SocialMind.Web",
+            "browser": "edge",
+            "url": "https://localhost:7259"
+        },
+        {
+            "name": ".NET Core Launch (Web)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-web",
+            "program": "${workspaceFolder}/SocialMind/SocialMind.Web/bin/Debug/net10.0/SocialMind.Web.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/SocialMind/SocialMind.Web",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Launch MAUI (Windows)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-maui-windows",
+            "program": "${workspaceFolder}/SocialMind/SocialMind/bin/Debug/net10.0-windows10.0.19041.0/win-x64/SocialMind.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/SocialMind/SocialMind",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Docker: Launch Web",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "netCore": {
+                "appProject": "${workspaceFolder}/SocialMind/SocialMind.Web/SocialMind.Web.csproj"
+            }
+        },
+        {
+            "name": "Attach to Process",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Web + SQL Server",
+            "configurations": [
+                "Docker: Launch Web"
+            ],
+            "stopAll": true
+        }
+    ]
+}

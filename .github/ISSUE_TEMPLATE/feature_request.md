@@ -1,0 +1,34 @@
+---
+name: ✨ Feature Request
+about: Yeni bir özellik önerin
+title: '[FEATURE] '
+labels: enhancement
+assignees: ''
+
+---
+
+## ✨ Özellik Açıklaması
+
+Özelliği açık bir şekilde tanımlayın.
+
+## 🎯 Problem
+
+Bu özellik hangi sorunu çözüyor?
+
+## 💡 Önerilen Çözüm
+
+Özelliğin nasıl çalışmasını istiyorsunuz?
+
+## 🔄 Alternatifler
+
+Düşündüğünüz alternatif çözümler var mı?
+
+## 📊 Öncelik
+
+- [ ] Yüksek
+- [ ] Orta
+- [ ] Düşük
+
+## 📋 Ek Bilgiler
+
+Mockup, tasarım veya örnek var mı?

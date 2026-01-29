@@ -1,0 +1,33 @@
+{
+    "recommendations": [
+        // .NET Development
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.dotnet-maui",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        // GitHub & Git
+        "github.vscode-pull-request-github",
+        "github.vscode-github-actions",
+        "github.copilot",
+        "github.copilot-chat",
+        "eamodio.gitlens",
+        // Docker & Containers
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        // Azure
+        "ms-azuretools.vscode-azurefunctions",
+        "ms-azuretools.vscode-azureappservice",
+        "ms-azuretools.vscode-cosmosdb",
+        "ms-azuretools.vscode-azurestaticwebapps",
+        // Database
+        "ms-mssql.mssql",
+        "ms-mssql.sql-database-projects-vscode",
+        // Code Quality
+        "davidanson.vscode-markdownlint",
+        "redhat.vscode-yaml",
+        "dotjoshjohnson.xml",
+        // AI & Copilot
+        "ms-vscode.vscode-copilot-vision",
+        "ms-vscode.vscode-copilot-data-analysis"
+    ]
+}

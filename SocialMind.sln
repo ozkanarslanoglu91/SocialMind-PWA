@@ -1,0 +1,43 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SocialMind", "SocialMind", "{B9A5FEBC-F9D7-76A6-B6F3-8C448A4C26C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialMind", "SocialMind\SocialMind\SocialMind.csproj", "{210548FB-99C3-872D-95CA-C9D10E671469}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialMind.Shared", "SocialMind\SocialMind.Shared\SocialMind.Shared.csproj", "{8BA88996-0ED3-2A05-E056-FAFA39A1ADFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialMind.Web", "SocialMind\SocialMind.Web\SocialMind.Web.csproj", "{299614DB-9384-86E5-C806-0F717960056C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{210548FB-99C3-872D-95CA-C9D10E671469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{210548FB-99C3-872D-95CA-C9D10E671469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{210548FB-99C3-872D-95CA-C9D10E671469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{210548FB-99C3-872D-95CA-C9D10E671469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BA88996-0ED3-2A05-E056-FAFA39A1ADFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BA88996-0ED3-2A05-E056-FAFA39A1ADFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BA88996-0ED3-2A05-E056-FAFA39A1ADFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BA88996-0ED3-2A05-E056-FAFA39A1ADFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{299614DB-9384-86E5-C806-0F717960056C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{299614DB-9384-86E5-C806-0F717960056C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{299614DB-9384-86E5-C806-0F717960056C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{299614DB-9384-86E5-C806-0F717960056C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{210548FB-99C3-872D-95CA-C9D10E671469} = {B9A5FEBC-F9D7-76A6-B6F3-8C448A4C26C7}
+		{8BA88996-0ED3-2A05-E056-FAFA39A1ADFA} = {B9A5FEBC-F9D7-76A6-B6F3-8C448A4C26C7}
+		{299614DB-9384-86E5-C806-0F717960056C} = {B9A5FEBC-F9D7-76A6-B6F3-8C448A4C26C7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {72A995CE-C082-460A-91D5-1972CB266AD5}
+	EndGlobalSection
+EndGlobal
