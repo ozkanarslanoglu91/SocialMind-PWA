@@ -1,0 +1,548 @@
+@page "/create-post"
+@using SocialMind.Shared.Models
+@using SocialMind.Shared.Services
+@using SocialMind.Shared.Components
+@inject IPostService PostService
+@inject IAIService AIService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Gönderi Oluştur - SocialMind</PageTitle>
+
+<div class="create-post-container">
+    <div class="header">
+        <h1>✍️ Yeni Gönderi Oluştur</h1>
+        <div class="header-actions">
+            <button class="btn-secondary" @onclick="Cancel">İptal</button>
+            <button class="btn-primary" @onclick="SaveDraft">Taslak Kaydet</button>
+            <button class="btn-success" @onclick="PublishNow" disabled="@(!CanPublish)">Yayınla</button>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <!-- Sol Panel: Form -->
+        <div class="left-panel">
+            <!-- Platform Seçimi -->
+            <div class="form-section">
+                <PlatformSelector @bind-SelectedPlatforms="newPost.Platforms" />
+            </div>
+
+            <!-- Başlık -->
+            <div class="form-section">
+                <label for="title">Başlık (İsteğe bağlı)</label>
+                <input id="title" type="text" class="form-input" @bind="newPost.Title"
+                       placeholder="Gönderinize bir başlık verin" />
+            </div>
+
+            <!-- İçerik -->
+            <div class="form-section">
+                <label for="content">İçerik</label>
+                <textarea id="content" class="form-textarea" rows="8" @bind="newPost.Content" @bind:event="oninput"
+                          placeholder="Mesajınızı yazın..."></textarea>
+                
+                <!-- Karakter Sayaçları -->
+                @if (newPost.Platforms.Any())
+                {
+                    <div class="character-counters">
+                        @foreach (var platform in newPost.Platforms)
+                        {
+                            <CharacterCounter Platform="platform" Content="@newPost.Content" />
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- AI İçerik Üretimi -->
+            <div class="form-section">
+                <button class="btn-ai" @onclick="ShowAIGenerator">
+                    🤖 AI ile İçerik Üret
+                </button>
+            </div>
+
+            @if (showAIGenerator)
+            {
+                <div class="ai-generator">
+                    <AIModelSelector @bind-SelectedModelId="selectedAIModel" />
+                    
+                    <div class="form-group">
+                        <label>AI'ya ne yazmasını istiyorsunuz?</label>
+                        <textarea class="form-textarea" rows="3" @bind="aiPrompt"
+                                  placeholder="Örn: Yapay zeka ile sosyal medya yönetimi hakkında ilgi çekici bir gönderi yaz"></textarea>
+                    </div>
+
+                    <button class="btn-primary" @onclick="GenerateContent" disabled="@isGenerating">
+                        @if (isGenerating)
+                        {
+                            <span>⏳ Üretiliyor...</span>
+                        }
+                        else
+                        {
+                            <span>✨ Üret</span>
+                        }
+                    </button>
+
+                    @if (generatedContents.Any())
+                    {
+                        <div class="generated-options">
+                            <h4>AI Önerileri:</h4>
+                            @foreach (var content in generatedContents)
+                            {
+                                <div class="generated-option" @onclick="() => UseGeneratedContent(content)">
+                                    <p>@content.Content</p>
+                                    <button class="btn-small">Kullan</button>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Hashtag Önerileri -->
+            <div class="form-section">
+                <h3>🏷️ Hashtag Önerileri</h3>
+                @if (newPost.Hashtags != null && newPost.Hashtags.Any())
+                {
+                    <div class="hashtag-list">
+                        @foreach (var hashtag in newPost.Hashtags)
+                        {
+                            <span class="hashtag-badge">
+                                #@hashtag
+                                <button @onclick="() => RemoveHashtag(hashtag)">×</button>
+                            </span>
+                        }
+                    </div>
+                }
+                <button class="btn-secondary" @onclick="GenerateHashtags">
+                    Hashtag Öner
+                </button>
+            </div>
+
+            <!-- Zamanlama -->
+            <div class="form-section">
+                <h3>📅 Zamanlama</h3>
+                <div class="schedule-options">
+                    <label>
+                        <input type="radio" name="schedule" checked="@(scheduleType == "now")"
+                               @onchange="@(() => scheduleType = "now")" />
+                        Şimdi Yayınla
+                    </label>
+                    <label>
+                        <input type="radio" name="schedule" checked="@(scheduleType == "later")"
+                               @onchange="@(() => scheduleType = "later")" />
+                        Zamanla
+                    </label>
+                </div>
+
+                @if (scheduleType == "later")
+                {
+                    <input type="datetime-local" class="form-input" @bind="scheduledTime" />
+                }
+            </div>
+        </div>
+
+        <!-- Sağ Panel: Önizleme -->
+        <div class="right-panel">
+            <h3>📱 Önizleme</h3>
+            @if (newPost.Platforms.Any())
+            {
+                @foreach (var platform in newPost.Platforms)
+                {
+                    <div class="platform-preview">
+                        <h4>@platform</h4>
+                        <div class="preview-card">
+                            <div class="preview-header">
+                                <div class="preview-avatar">
+                                    @platform.ToString().Substring(0, 1)
+                                </div>
+                                <div class="preview-user">
+                                    <strong>@GetPlatformUsername(platform)</strong>
+                                    <span>@DateTime.Now.ToString("HH:mm")</span>
+                                </div>
+                            </div>
+                            <div class="preview-content">
+                                @GetPreviewContent(platform)
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-preview">
+                    <p>Platform seçin ve içerik yazın</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .create-post-container {
+        padding: 2rem;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 1.75rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 2rem;
+    }
+
+    .left-panel,
+    .right-panel {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .right-panel {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+        max-height: calc(100vh - 4rem);
+        overflow-y: auto;
+    }
+
+    .form-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.125rem;
+    }
+
+    .form-section label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+
+    .form-input,
+    .form-textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+
+    .form-textarea {
+        resize: vertical;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-success,
+    .btn-ai {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: #6366f1;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #4f46e5;
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
+    }
+
+    .btn-success {
+        background: #059669;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #047857;
+    }
+
+    .btn-success:disabled {
+        background: #d1d5db;
+        cursor: not-allowed;
+    }
+
+    .btn-ai {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 1rem;
+    }
+
+    .ai-generator {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 0.5rem;
+    }
+
+    .generated-options {
+        margin-top: 1rem;
+    }
+
+    .generated-option {
+        padding: 1rem;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .generated-option:hover {
+        border-color: #6366f1;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+    }
+
+    .hashtag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .hashtag-badge {
+        padding: 0.25rem 0.75rem;
+        background: #f3f4f6;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .hashtag-badge button {
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        font-size: 1.25rem;
+        padding: 0;
+    }
+
+    .schedule-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .schedule-options label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .platform-preview {
+        margin-bottom: 1.5rem;
+    }
+
+    .platform-preview h4 {
+        margin: 0 0 0.75rem 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+    }
+
+    .preview-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        background: #f9fafb;
+    }
+
+    .preview-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .preview-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #6366f1;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .preview-user strong {
+        display: block;
+        font-size: 0.875rem;
+    }
+
+    .preview-user span {
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+
+    .preview-content {
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .empty-preview {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #9ca3af;
+    }
+
+    @@media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .right-panel {
+            position: static;
+            max-height: none;
+        }
+    }
+</style>
+
+@code {
+    private Post newPost = new Post();
+    private string scheduleType = "now";
+    private DateTime? scheduledTime;
+    private bool showAIGenerator = false;
+    private string selectedAIModel = "gpt-4o-mini";
+    private string aiPrompt = string.Empty;
+    private bool isGenerating = false;
+    private List<AIGeneratedContent> generatedContents = new();
+
+    private bool CanPublish => newPost.Platforms.Any() && !string.IsNullOrWhiteSpace(newPost.Content);
+
+    private void ShowAIGenerator()
+    {
+        showAIGenerator = !showAIGenerator;
+    }
+
+    private async Task GenerateContent()
+    {
+        if (string.IsNullOrWhiteSpace(aiPrompt)) return;
+
+        isGenerating = true;
+        try
+        {
+            generatedContents = await AIService.GenerateMultipleContentAsync(aiPrompt, selectedAIModel, 3);
+        }
+        finally
+        {
+            isGenerating = false;
+        }
+    }
+
+    private void UseGeneratedContent(AIGeneratedContent content)
+    {
+        newPost.Content = content.Content;
+        newPost.AIModelUsed = content.ModelId;
+        newPost.AIPrompt = content.Prompt;
+        showAIGenerator = false;
+    }
+
+    private async Task GenerateHashtags()
+    {
+        if (string.IsNullOrWhiteSpace(newPost.Content) || !newPost.Platforms.Any()) return;
+
+        var hashtags = await AIService.GenerateHashtagsAsync(
+            newPost.Content,
+            newPost.Platforms.First(),
+            10
+        );
+        
+        newPost.Hashtags = hashtags;
+    }
+
+    private void RemoveHashtag(string hashtag)
+    {
+        newPost.Hashtags?.Remove(hashtag);
+    }
+
+    private async Task SaveDraft()
+    {
+        newPost.Status = PostStatus.Draft;
+        await PostService.CreatePostAsync(newPost);
+        Navigation.NavigateTo("/");
+    }
+
+    private async Task PublishNow()
+    {
+        if (scheduleType == "now")
+        {
+            newPost.Status = PostStatus.Published;
+            newPost.PublishedAt = DateTime.UtcNow;
+            await PostService.CreatePostAsync(newPost);
+            await PostService.PublishToMultiplePlatformsAsync(newPost.Id);
+        }
+        else if (scheduledTime.HasValue)
+        {
+            newPost.Status = PostStatus.Scheduled;
+            newPost.ScheduledAt = scheduledTime.Value;
+            await PostService.CreatePostAsync(newPost);
+        }
+
+        Navigation.NavigateTo("/");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private string GetPlatformUsername(SocialPlatform platform)
+    {
+        return $"@socialmind_{platform.ToString().ToLower()}";
+    }
+
+    private string GetPreviewContent(SocialPlatform platform)
+    {
+        if (string.IsNullOrWhiteSpace(newPost.Content))
+            return "İçeriğiniz burada görünecek...";
+
+        var maxLength = PlatformRegistry.GetMaxCharacterLimit(platform);
+        if (newPost.Content.Length > maxLength)
+        {
+            return newPost.Content.Substring(0, maxLength - 3) + "...";
+        }
+
+        return newPost.Content;
+    }
+}

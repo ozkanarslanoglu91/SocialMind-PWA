@@ -8,7 +8,9 @@ public enum AIProvider
     OpenAI,
     GoogleGemini,
     NVIDIA,
-    GitHubModels
+    GitHubModels,
+    MicrosoftFoundry,
+    AzureOpenAI
 }
 
 /// <summary>
@@ -222,6 +224,118 @@ public static class AIModelRegistry
             IsFree = true,
             SupportedLanguages = ["en"],
             Capabilities = ["Uzun dökümanlar", "Kapsamlı analiz"]
+        },
+
+        // Microsoft Foundry / Azure AI
+        new AIModel
+        {
+            Id = "phi-4",
+            Name = "Phi-4",
+            Description = "Microsoft'un en yeni kompakt modeli - yüksek performans, düşük maliyet",
+            Provider = AIProvider.MicrosoftFoundry,
+            CostPerMillion = 0m,
+            ContextWindow = 16000,
+            IsFree = true,
+            SupportedLanguages = ["en", "tr"],
+            Capabilities = ["Kod üretimi", "Matematik", "Akıl yürütme", "Problem çözümü"]
+        },
+        new AIModel
+        {
+            Id = "phi-3.5-mini",
+            Name = "Phi-3.5 Mini",
+            Description = "Küçük ama güçlü - edge cihazlar için optimize edilmiş",
+            Provider = AIProvider.MicrosoftFoundry,
+            CostPerMillion = 0m,
+            ContextWindow = 128000,
+            IsFree = true,
+            SupportedLanguages = ["en", "tr"],
+            Capabilities = ["Hızlı yanıtlar", "Edge computing", "Düşük latency"]
+        },
+        new AIModel
+        {
+            Id = "phi-3-medium",
+            Name = "Phi-3 Medium",
+            Description = "Denge - performans ve verimlilik",
+            Provider = AIProvider.MicrosoftFoundry,
+            CostPerMillion = 0m,
+            ContextWindow = 128000,
+            IsFree = true,
+            SupportedLanguages = ["en", "tr", "es", "fr", "de"],
+            Capabilities = ["Çok dilli", "İçerik üretimi", "Analiz"]
+        },
+        new AIModel
+        {
+            Id = "llama-3.3-70b-instruct",
+            Name = "Llama 3.3 70B Instruct",
+            Description = "Meta'nın instruction-tuned modeli - Azure üzerinde",
+            Provider = AIProvider.MicrosoftFoundry,
+            CostPerMillion = 0.77m,
+            ContextWindow = 128000,
+            IsFree = false,
+            SupportedLanguages = ["en", "tr", "es", "fr", "de", "it", "pt"],
+            Capabilities = ["Gelişmiş akıl yürütme", "Kod üretimi", "Çok dilli içerik"]
+        },
+        new AIModel
+        {
+            Id = "mistral-large-2411",
+            Name = "Mistral Large 2411",
+            Description = "Mistral AI'ın en gelişmiş modeli - Azure üzerinde",
+            Provider = AIProvider.MicrosoftFoundry,
+            CostPerMillion = 2m,
+            ContextWindow = 128000,
+            IsFree = false,
+            SupportedLanguages = ["en", "fr", "es", "de", "it", "tr"],
+            Capabilities = ["Function calling", "JSON mode", "Gelişmiş akıl yürütme"]
+        },
+        new AIModel
+        {
+            Id = "mistral-small",
+            Name = "Mistral Small",
+            Description = "Hızlı ve uygun maliyetli Mistral modeli",
+            Provider = AIProvider.MicrosoftFoundry,
+            CostPerMillion = 0.2m,
+            ContextWindow = 32000,
+            IsFree = false,
+            SupportedLanguages = ["en", "fr", "es", "de", "it"],
+            Capabilities = ["Hızlı yanıtlar", "Düşük maliyet", "Çok dilli"]
+        },
+
+        // Azure OpenAI (Enterprise)
+        new AIModel
+        {
+            Id = "gpt-4o-azure",
+            Name = "GPT-4o (Azure)",
+            Description = "Azure OpenAI Service - Enterprise özelliklerle",
+            Provider = AIProvider.AzureOpenAI,
+            CostPerMillion = 2.50m,
+            ContextWindow = 128000,
+            IsFree = false,
+            SupportedLanguages = ["en", "tr", "fr", "es", "de", "ja", "zh"],
+            Capabilities = ["İçerik üretimi", "Görüntü analizi", "Enterprise compliance", "Private network"]
+        },
+        new AIModel
+        {
+            Id = "gpt-4-turbo-azure",
+            Name = "GPT-4 Turbo (Azure)",
+            Description = "Azure OpenAI - Yüksek throughput ve enterprise güvenlik",
+            Provider = AIProvider.AzureOpenAI,
+            CostPerMillion = 10m,
+            ContextWindow = 128000,
+            IsFree = false,
+            SupportedLanguages = ["en", "tr", "fr", "es", "de", "ja", "zh"],
+            Capabilities = ["Gelişmiş akıl yürütme", "Enterprise SLA", "Data residency", "Compliance"]
+        },
+        new AIModel
+        {
+            Id = "gpt-35-turbo-azure",
+            Name = "GPT-3.5 Turbo (Azure)",
+            Description = "Azure OpenAI - Hızlı ve uygun maliyetli",
+            Provider = AIProvider.AzureOpenAI,
+            CostPerMillion = 0.5m,
+            ContextWindow = 16000,
+            IsFree = false,
+            SupportedLanguages = ["en", "tr", "fr", "es", "de"],
+            Capabilities = ["Hızlı yanıtlar", "Düşük maliyet", "Enterprise güvenlik"]
         }
     ];
 

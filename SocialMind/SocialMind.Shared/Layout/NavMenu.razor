@@ -1,6 +1,27 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SocialMind.Shared.Models
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">SocialMind</a>
+        <a class="navbar-brand" href="">
+            <span style="font-size: 1.5rem;">🌐</span> SocialMind
+        </a>
+        <AuthorizeView>
+            <Authorized>
+                <div class="user-menu">
+                    <span class="user-name">@context.User.Identity?.Name</span>
+                    <a href="/logout" class="btn-logout">Çıkış</a>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="auth-links">
+                    <a href="/login" class="btn-login">Giriş</a>
+                    <a href="/register" class="btn-register">Kayıt Ol</a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </div>
 
@@ -10,21 +31,128 @@
     <nav class="nav flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Dashboard
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="create-post">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Gönderi Oluştur
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            <NavLink class="nav-link" href="schedule">
+                <span class="bi bi-calendar-fill-nav-menu" aria-hidden="true"></span> Zamanlama
             </NavLink>
         </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="analytics">
+                <span class="bi bi-bar-chart-fill-nav-menu" aria-hidden="true"></span> Analitik
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="social-dashboard">
+                <span class="bi bi-grid-fill-nav-menu" aria-hidden="true"></span> Platform Yönetimi
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="connected-accounts">
+                <span class="bi bi-link-45deg-nav-menu" aria-hidden="true"></span> Bağlı Hesaplar
+            </NavLink>
+        </div>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="subscription">
+                        <span class="bi bi-credit-card-fill-nav-menu" aria-hidden="true"></span> Abonelik
+                    </NavLink>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="pricing">
+                        <span class="bi bi-tag-fill-nav-menu" aria-hidden="true"></span> Fiyatlandırma
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <div class="nav-item px-3 mt-3 border-top pt-3">
+                    <div class="text-muted small px-3 mb-2">ADMIN</div>
+                    <NavLink class="nav-link" href="admin/dashboard">
+                        <span class="bi bi-shield-fill-nav-menu" aria-hidden="true"></span> Admin Dashboard
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </nav>
 </div>
+
+<style>
+    .user-menu {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .user-name {
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .btn-logout {
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .auth-links {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn-login,
+    .btn-register {
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+
+    .btn-login {
+        color: white;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-login:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-register {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+</style>
 

@@ -1,0 +1,194 @@
+@using SocialMind.Shared.Models
+
+<div class="ai-model-selector">
+    <h3>AI Model Seç</h3>
+    
+    <div class="provider-tabs">
+        @foreach (var provider in Enum.GetValues<AIProvider>())
+        {
+            <button class="provider-tab @(SelectedProvider == provider ? "active" : "")"
+                    @onclick="() => SelectProvider(provider)">
+                @provider.ToString()
+            </button>
+        }
+    </div>
+    
+    <div class="models-grid">
+        @foreach (var model in GetModelsForProvider())
+        {
+            var isSelected = SelectedModelId == model.Id;
+            
+            <div class="model-card @(isSelected ? "selected" : "")"
+                 @onclick="() => SelectModel(model)">
+                <div class="model-header">
+                    <h4>@model.Name</h4>
+                    @if (model.IsFree)
+                    {
+                        <span class="badge free-badge">ÜCRETSİZ</span>
+                    }
+                    else
+                    {
+                        <span class="badge price-badge">$@model.CostPerMillion/1M</span>
+                    }
+                </div>
+                <p class="model-description">@model.Description</p>
+                <div class="model-specs">
+                    <span class="spec">📝 @FormatContextWindow(model.ContextWindow)</span>
+                    <span class="spec">🌍 @model.SupportedLanguages.Length dil</span>
+                </div>
+                @if (isSelected)
+                {
+                    <div class="selected-indicator">✓ Seçildi</div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .ai-model-selector {
+        margin: 1rem 0;
+    }
+    
+    .provider-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+    }
+    
+    .provider-tab {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e5e7eb;
+        background: white;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .provider-tab:hover {
+        border-color: #6366f1;
+    }
+    
+    .provider-tab.active {
+        background: #6366f1;
+        color: white;
+        border-color: #6366f1;
+    }
+    
+    .models-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .model-card {
+        border: 2px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+    }
+    
+    .model-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    }
+    
+    .model-card.selected {
+        border-color: #6366f1;
+        background: #f0f1ff;
+    }
+    
+    .model-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 0.5rem;
+    }
+    
+    .model-header h4 {
+        margin: 0;
+        font-size: 1rem;
+        color: #1f2937;
+    }
+    
+    .badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .free-badge {
+        background: #d1fae5;
+        color: #059669;
+    }
+    
+    .price-badge {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .model-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0.5rem 0;
+    }
+    
+    .model-specs {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.75rem;
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+    
+    .selected-indicator {
+        margin-top: 0.75rem;
+        padding: 0.5rem;
+        background: #6366f1;
+        color: white;
+        text-align: center;
+        border-radius: 0.375rem;
+        font-weight: 600;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string SelectedModelId { get; set; } = "gpt-4o-mini";
+    
+    [Parameter]
+    public EventCallback<string> SelectedModelIdChanged { get; set; }
+    
+    private AIProvider SelectedProvider { get; set; } = AIProvider.OpenAI;
+    
+    private IEnumerable<AIModel> GetModelsForProvider()
+    {
+        return AIModelRegistry.GetByProvider(SelectedProvider);
+    }
+    
+    private void SelectProvider(AIProvider provider)
+    {
+        SelectedProvider = provider;
+    }
+    
+    private void SelectModel(AIModel model)
+    {
+        SelectedModelId = model.Id;
+        SelectedModelIdChanged.InvokeAsync(model.Id);
+    }
+    
+    private string FormatContextWindow(int contextWindow)
+    {
+        if (contextWindow >= 1000000)
+            return $"{contextWindow / 1000000}M tokens";
+        if (contextWindow >= 1000)
+            return $"{contextWindow / 1000}K tokens";
+        return $"{contextWindow} tokens";
+    }
+}

@@ -1,0 +1,483 @@
+@page "/checkout"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using global::SocialMind.Shared.Models
+@using global::SocialMind.Web.Data
+@using global::SocialMind.Web.Services
+@attribute [Authorize]
+@inject ApplicationDbContext DbContext
+@inject UserManager<ApplicationUser> UserManager
+@inject StripePaymentService StripeService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@rendermode InteractiveServer
+
+<PageTitle>Ödeme - SocialMind</PageTitle>
+
+<div class="checkout-container">
+    @if (isLoading)
+    {
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <h2>Ödeme sayfası hazırlanıyor...</h2>
+            <p>Stripe ödeme sayfasına yönlendiriliyorsunuz</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="error-state">
+            <div class="error-icon">❌</div>
+            <h2>Bir Hata Oluştu</h2>
+            <p>@errorMessage</p>
+            <a href="/pricing" class="btn btn-primary">Planları Görüntüle</a>
+        </div>
+    }
+    else if (selectedPlan != null)
+    {
+        <div class="checkout-content">
+            <div class="checkout-header">
+                <h1>Ödeme Sayfası</h1>
+                <p>Seçtiğiniz plan için ödeme işlemini tamamlayın</p>
+            </div>
+
+            <div class="plan-summary">
+                <h2>Plan Özeti</h2>
+                
+                <div class="plan-details">
+                    <div class="plan-name">
+                        <strong>@selectedPlan.Name Plan</strong>
+                        @if (selectedPlan.IsPopular)
+                        {
+                            <span class="popular-badge">Popüler</span>
+                        }
+                    </div>
+
+                    <div class="billing-info">
+                        <span class="price">
+                            $@(isYearly ? (selectedPlan.MonthlyPrice * 10).ToString("F2") : selectedPlan.MonthlyPrice.ToString("F2"))
+                        </span>
+                        <span class="period">/@(isYearly ? "yıl" : "ay")</span>
+                    </div>
+
+                    @if (isYearly)
+                    {
+                        <div class="savings">
+                            💰 Yıllık ödemede %17 tasarruf! 
+                            (Aylık $@(selectedPlan.MonthlyPrice * 10 / 12).ToString("F2"))
+                        </div>
+                    }
+
+                    <div class="trial-notice">
+                        🎉 <strong>14 gün ücretsiz deneme!</strong> İlk ödemeniz deneme süreniz sonunda alınacaktır.
+                    </div>
+
+                    <div class="plan-features">
+                        <h3>Plana Dahil:</h3>
+                        <ul>
+                            <li>✓ @(selectedPlan.MaxPosts == -1 ? "Sınırsız" : selectedPlan.MaxPosts) gönderi/ay</li>
+                            <li>✓ @(selectedPlan.MaxAIGenerations == -1 ? "Sınırsız" : selectedPlan.MaxAIGenerations) AI içerik/ay</li>
+                            <li>✓ @selectedPlan.MaxConnectedAccounts bağlı hesap</li>
+                            @if (selectedPlan.HasAdvancedAnalytics)
+                            {
+                                <li>✓ Gelişmiş analitik</li>
+                            }
+                            @if (selectedPlan.HasTeamCollaboration)
+                            {
+                                <li>✓ Takım işbirliği</li>
+                            }
+                            @if (selectedPlan.HasPrioritySupport)
+                            {
+                                <li>✓ Öncelikli destek</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <button class="btn btn-checkout" @onclick="ProcessCheckout" disabled="@isProcessing">
+                    @if (isProcessing)
+                    {
+                        <span class="btn-spinner"></span>
+                        <span>İşleniyor...</span>
+                    }
+                    else
+                    {
+                        <span>Ödemeye Geç</span>
+                    }
+                </button>
+
+                <div class="secure-notice">
+                    🔒 Güvenli ödeme - Stripe tarafından işlenir
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-card">
+                    <h3>💳 Güvenli Ödeme</h3>
+                    <p>Tüm ödemeler endüstrinin en güvenli ödeme platformu Stripe tarafından işlenir. Kredi kartı bilgileriniz bizimle paylaşılmaz.</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>🔄 İptal Garantisi</h3>
+                    <p>Aboneliğinizi istediğiniz zaman iptal edebilirsiniz. İptal sonrası mevcut fatura döneminizin sonuna kadar erişiminiz devam eder.</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>📧 Destek</h3>
+                    <p>Herhangi bir sorunuz olduğunda 7/24 destek ekibimiz size yardımcı olmaya hazır.</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "plan")]
+    public string? PlanId { get; set; }
+
+    [SupplyParameterFromQuery(Name = "billing")]
+    public string? BillingPeriod { get; set; }
+
+    private SubscriptionPlan? selectedPlan;
+    private bool isYearly;
+    private bool isLoading = true;
+    private bool isProcessing = false;
+    private string? errorMessage;
+    private string? userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated != true)
+        {
+            NavigationManager.NavigateTo("/login?returnUrl=/checkout");
+            return;
+        }
+
+        var appUser = await UserManager.GetUserAsync(user);
+        if (appUser != null)
+        {
+            userId = appUser.Id;
+        }
+
+        if (string.IsNullOrEmpty(PlanId))
+        {
+            errorMessage = "Lütfen bir plan seçin.";
+            isLoading = false;
+            return;
+        }
+
+        // Load selected plan
+        selectedPlan = await DbContext.SubscriptionPlans
+            .FirstOrDefaultAsync(p => p.Id == PlanId);
+
+        if (selectedPlan == null)
+        {
+            errorMessage = "Seçilen plan bulunamadı.";
+            isLoading = false;
+            return;
+        }
+
+        if (selectedPlan.Id == "free")
+        {
+            errorMessage = "Ücretsiz plan için ödeme gerekmez.";
+            isLoading = false;
+            return;
+        }
+
+        // Check if user already has a subscription
+        var existingSubscription = await DbContext.UserSubscriptions
+            .FirstOrDefaultAsync(s => s.UserId == userId);
+
+        if (existingSubscription != null && existingSubscription.Status == SubscriptionStatus.Active)
+        {
+            errorMessage = "Zaten aktif bir aboneliğiniz var. Planınızı değiştirmek için abonelik yönetimi sayfasını kullanın.";
+            isLoading = false;
+            return;
+        }
+
+        isYearly = BillingPeriod?.ToLower() == "yearly";
+        isLoading = false;
+    }
+
+    private async Task ProcessCheckout()
+    {
+        if (string.IsNullOrEmpty(userId) || selectedPlan == null)
+        {
+            errorMessage = "Ödeme işlemi başlatılamadı.";
+            return;
+        }
+
+        isProcessing = true;
+        errorMessage = null;
+
+        try
+        {
+            var successUrl = NavigationManager.ToAbsoluteUri("/checkout/success").ToString();
+            var cancelUrl = NavigationManager.ToAbsoluteUri("/checkout?plan=" + PlanId + "&billing=" + BillingPeriod).ToString();
+
+            var sessionUrl = await StripeService.CreateCheckoutSessionAsync(
+                userId,
+                selectedPlan.Id,
+                isYearly,
+                successUrl,
+                cancelUrl
+            );
+
+            // Redirect to Stripe Checkout
+            NavigationManager.NavigateTo(sessionUrl, forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Ödeme işlemi başlatılırken bir hata oluştu: " + ex.Message;
+            isProcessing = false;
+        }
+    }
+}
+
+<style>
+    .checkout-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .loading-state, .error-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .spinner {
+        border: 4px solid #f3f4f6;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 2rem;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .error-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .error-state h2 {
+        color: #e53e3e;
+        margin-bottom: 1rem;
+    }
+
+    .checkout-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .checkout-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+    }
+
+    .checkout-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    .plan-summary {
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        position: sticky;
+        top: 2rem;
+    }
+
+    .plan-summary h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1a202c;
+    }
+
+    .plan-details {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .plan-name {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+    }
+
+    .popular-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .billing-info {
+        margin: 1.5rem 0;
+    }
+
+    .price {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    .period {
+        font-size: 1.1rem;
+        color: #718096;
+    }
+
+    .savings {
+        background: #c6f6d5;
+        color: #22543d;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        font-weight: 500;
+    }
+
+    .trial-notice {
+        background: #ebf8ff;
+        border: 2px solid #90cdf4;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        color: #2c5282;
+    }
+
+    .plan-features {
+        margin-top: 1.5rem;
+    }
+
+    .plan-features h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #2d3748;
+    }
+
+    .plan-features ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .plan-features li {
+        padding: 0.5rem 0;
+        color: #4a5568;
+    }
+
+    .btn-checkout {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-checkout:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-checkout:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn-spinner {
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .secure-notice {
+        text-align: center;
+        color: #718096;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .info-card h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #2d3748;
+    }
+
+    .info-card p {
+        color: #4a5568;
+        line-height: 1.6;
+    }
+
+    .btn {
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    @@media (max-width: 968px) {
+        .checkout-content {
+            grid-template-columns: 1fr;
+        }
+
+        .plan-summary {
+            position: static;
+        }
+    }
+</style>

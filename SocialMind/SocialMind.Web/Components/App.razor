@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Components.Routing
+@using global::SocialMind.Shared.Layout
+@using global::SocialMind.Shared.Pages
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -13,10 +17,26 @@
 </head>
 
 <body>
-    <div id="app" style="display: contents;"></div>
+    <Router AppAssembly="@typeof(Program).Assembly" AdditionalAssemblies="@(new[] { typeof(MainLayout).Assembly })">
+        <Found Context="routeData">
+            <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="typeof(MainLayout)">
+                <NotFound />
+            </LayoutView>
+        </NotFound>
+    </Router>
+
     <script src="_framework/blazor.web.js"></script>
 </body>
 
 </html>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+}
 
 

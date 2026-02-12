@@ -1,0 +1,416 @@
+@page "/analytics"
+@using SocialMind.Shared.Models
+@using SocialMind.Shared.Services
+@inject IAnalyticsService AnalyticsService
+@inject IPlatformService PlatformService
+
+<PageTitle>Analitik - SocialMind</PageTitle>
+
+<div class="analytics-container">
+    <div class="header">
+        <h1>📊 Analitik</h1>
+        <p>Sosyal medya performansınızı takip edin</p>
+    </div>
+
+    <!-- Platform Analytics -->
+    <div class="section">
+        <h2>Platform Performansı</h2>
+        <div class="platforms-grid">
+            @foreach (var analytics in platformAnalytics)
+            {
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-icon" style="background: @GetPlatformColor(analytics.Platform)">
+                            @analytics.Platform.ToString().Substring(0, 1)
+                        </div>
+                        <h3>@analytics.Platform</h3>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">@analytics.TotalFollowers.ToString("N0")</div>
+                            <div class="metric-label">Takipçi</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">@analytics.TotalEngagement.ToString("N0")</div>
+                            <div class="metric-label">Etkileşim</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">@analytics.TotalImpressions.ToString("N0")</div>
+                            <div class="metric-label">Gösterim</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">%@analytics.EngagementRate.ToString("F1")</div>
+                            <div class="metric-label">Etkileşim Oranı</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Top Posts -->
+    <div class="section">
+        <h2>🏆 En Başarılı Gönderiler</h2>
+        <div class="posts-table">
+            @if (topPosts.Any())
+            {
+                @foreach (var (post, index) in topPosts.Select((p, i) => (p, i)))
+                {
+                    <div class="post-row">
+                        <div class="post-rank">#{index + 1}</div>
+                        <div class="post-platform">
+                            <span class="platform-badge" style="background: @GetPlatformColor(post.Platform)">
+                                @post.Platform
+                            </span>
+                        </div>
+                        <div class="post-stats">
+                            <div class="stat">
+                                <span class="stat-icon">❤️</span>
+                                <span>@post.Likes</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-icon">💬</span>
+                                <span>@post.Comments</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-icon">🔄</span>
+                                <span>@post.Shares</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-icon">👁️</span>
+                                <span>@post.Impressions</span>
+                            </div>
+                        </div>
+                        <div class="post-engagement">
+                            <div class="engagement-bar" style="width: @(post.EngagementRate * 5)%"></div>
+                            <span>%@post.EngagementRate.ToString("F1")</span>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <p>Henüz analitik verisi yok</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Hashtag Performance -->
+    <div class="section">
+        <h2>#️⃣ En Popüler Hashtagler</h2>
+        <div class="hashtags-grid">
+            @foreach (var hashtag in topHashtags)
+            {
+                <div class="hashtag-card">
+                    <div class="hashtag-name">#@hashtag.Hashtag</div>
+                    <div class="hashtag-stats">
+                        <div class="stat">
+                            <span class="stat-label">Kullanım</span>
+                            <span class="stat-value">@hashtag.UsageCount</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Erişim</span>
+                            <span class="stat-value">@hashtag.TotalReach.ToString("N0")</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Etkileşim</span>
+                            <span class="stat-value">@hashtag.TotalEngagement.ToString("N0")</span>
+                        </div>
+                    </div>
+                    <div class="hashtag-platform">
+                        @hashtag.Platform
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Best Times -->
+    <div class="section">
+        <h2>⏰ En İyi Paylaşım Zamanları</h2>
+        <div class="best-times-grid">
+            @foreach (var bestTime in bestTimes)
+            {
+                <div class="time-card">
+                    <div class="time-platform">@bestTime.Platform</div>
+                    <div class="time-info">
+                        <div class="time-day">📅 @bestTime.BestDay</div>
+                        <div class="time-hour">🕐 @bestTime.BestHour:00</div>
+                    </div>
+                    <div class="time-engagement">
+                        Ort. Etkileşim: @bestTime.AverageEngagementAtTime.ToString("N0")
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .analytics-container {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .header {
+        margin-bottom: 2rem;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .header p {
+        color: #6b7280;
+        margin: 0;
+    }
+
+    .section {
+        margin-bottom: 2rem;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .section h2 {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.25rem;
+    }
+
+    .platforms-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .platform-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+    }
+
+    .platform-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .platform-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+
+    .platform-header h3 {
+        margin: 0;
+        font-size: 1.125rem;
+    }
+
+    .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .metric {
+        text-align: center;
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #1f2937;
+    }
+
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+
+    .posts-table {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .post-row {
+        display: grid;
+        grid-template-columns: 50px 150px 1fr auto;
+        gap: 1rem;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+    }
+
+    .post-rank {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #6366f1;
+        text-align: center;
+    }
+
+    .platform-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .post-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .stat-icon {
+        font-size: 1rem;
+    }
+
+    .post-engagement {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 100px;
+    }
+
+    .engagement-bar {
+        height: 8px;
+        background: linear-gradient(90deg, #6366f1, #a855f7);
+        border-radius: 4px;
+        transition: width 0.3s;
+    }
+
+    .hashtags-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .hashtag-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+
+    .hashtag-name {
+        font-size: 1.125rem;
+        font-weight: bold;
+        color: #6366f1;
+        margin-bottom: 1rem;
+    }
+
+    .hashtag-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+
+    .hashtag-stats .stat {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+
+    .stat-value {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .hashtag-platform {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .best-times-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .time-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .time-platform {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #1f2937;
+    }
+
+    .time-info {
+        margin: 0.75rem 0;
+    }
+
+    .time-day,
+    .time-hour {
+        font-size: 0.875rem;
+        margin: 0.25rem 0;
+    }
+
+    .time-engagement {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.75rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #9ca3af;
+    }
+</style>
+
+@code {
+    private List<PlatformAnalytics> platformAnalytics = new();
+    private List<PostAnalytics> topPosts = new();
+    private List<HashtagAnalytics> topHashtags = new();
+    private List<BestTimeAnalysis> bestTimes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAnalytics();
+    }
+
+    private async Task LoadAnalytics()
+    {
+        platformAnalytics = await AnalyticsService.GetAllPlatformAnalyticsAsync();
+        topPosts = await AnalyticsService.GetTopPostsAsync(10);
+        topHashtags = await AnalyticsService.GetTopHashtagsAsync(10);
+        bestTimes = await AnalyticsService.GetAllBestTimesAsync();
+    }
+
+    private string GetPlatformColor(SocialPlatform platform)
+    {
+        var config = PlatformRegistry.GetPlatform(platform);
+        return config?.Color ?? "#6366f1";
+    }
+}

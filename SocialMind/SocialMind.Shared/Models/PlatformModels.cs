@@ -43,6 +43,7 @@ public class PlatformConfiguration
 public class ConnectedAccount
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string UserId { get; set; } = string.Empty;
     public SocialPlatform Platform { get; set; }
     public string AccountName { get; set; } = string.Empty;
     public string AccountId { get; set; } = string.Empty;

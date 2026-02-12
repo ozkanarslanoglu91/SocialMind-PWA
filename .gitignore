@@ -201,3 +201,5 @@ logs/
 *.tmp
 *.temp
 .temp/
+
+.fake

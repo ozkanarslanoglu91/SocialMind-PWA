@@ -1,0 +1,51 @@
+version: "3.9"
+
+# SocialMind Development - Hot Reload Setup
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# .NET watches file changes automatically with DOTNET_WATCH=true
+
+services:
+  socialmind-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development # Development build without optimizations
+    volumes:
+      - ./src:/app/src
+      - ./Properties:/app/Properties
+      - socialmind_bin:/app/bin
+      - socialmind_obj:/app/obj
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - DOTNET_WATCH=true # Enable file watch for hot reload
+      - DOTNET_WATCH_IGNORE=bin,obj,**/*.sql
+    ports:
+      - "5000:80"
+      - "5001:443"
+    stdin_open: true
+    tty: true
+    # dotnet watch for hot reload
+    command: dotnet watch run --project SocialMind.Web/SocialMind.Web.csproj
+
+  sqlserver:
+    volumes:
+      - sqlserver_data_dev:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD:-DevPassword123!}
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+
+  redis:
+    volumes:
+      - redis_data_dev:/data
+    ports:
+      - "6379:6379"
+
+volumes:
+  socialmind_bin:
+  socialmind_obj:
+  sqlserver_data_dev:
+  redis_data_dev:
