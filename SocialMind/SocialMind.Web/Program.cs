@@ -125,6 +125,25 @@ builder.Services.AddScoped<IUsageTrackingService, UsageTrackingService>();
 // Add Controllers for API endpoints
 builder.Services.AddControllers();
 
+// Add Swagger/OpenAPI
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "SocialMind API",
+        Version = "v1",
+        Description = "Social Media Management Platform API",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "SocialMind Support",
+            Email = "support@socialmind.app"
+        }
+    });
+
+    var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), includeControllerXmlComments: true);
+});
+
 // Add Cascade Authentication State
 builder.Services.AddCascadingAuthenticationState();
 
@@ -197,6 +216,14 @@ else
 {
     app.UseDeveloperExceptionPage();
     app.UseMigrationsEndPoint();
+
+    // Enable Swagger in development
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "SocialMind API v1");
+        c.RoutePrefix = "api/swagger";
+    });
 }
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
