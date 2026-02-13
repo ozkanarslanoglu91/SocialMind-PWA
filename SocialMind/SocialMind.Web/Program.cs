@@ -108,8 +108,9 @@ builder.Services.AddScoped<IOAuthService>(sp => sp.GetRequiredService<InstagramO
 // TODO: Add real Instagram Service after resolving namespace issues
 // builder.Services.AddScoped(typeof(SocialMind.Web.Services.Instagram.IInstagramService), ...);
 
-// TODO: Add YouTube and TikTok services after resolving DI registration
-// (Services are implemented and tested, DI will be enabled once namespace resolution is fixed)
+// TODO: Add YouTube and TikTok services - namespace resolution issue with Services folder
+// Comment out for now, using Mock services in development
+// Once namespace is resolved, uncomment the following:
 // builder.Services.AddHttpClient<YouTubeService>();
 // builder.Services.AddScoped<IYouTubeService, YouTubeService>();
 // builder.Services.AddHttpClient<TikTokService>();
