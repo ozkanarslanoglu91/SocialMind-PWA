@@ -1,14 +1,14 @@
 using SocialMind.Shared.Models;
 
-namespace SocialMind.Web.Services.TikTok;
+namespace SocialMind.Web.Services;
 
 /// <summary>
-/// TikTok API service interface
+/// YouTube Data API service interface
 /// </summary>
-public interface ITikTokService
+public interface IYouTubeService
 {
     /// <summary>
-    /// Upload video to TikTok
+    /// Upload video to YouTube
     /// </summary>
     Task<ServiceResult<Post>> UploadVideoAsync(
         string accessToken,
@@ -16,54 +16,52 @@ public interface ITikTokService
         Post post);
 
     /// <summary>
-    /// Get TikTok creator info
+    /// Get YouTube channel info
     /// </summary>
-    Task<ServiceResult<TikTokCreator>> GetCreatorInfoAsync(string accessToken);
+    Task<ServiceResult<YouTubeChannel>> GetChannelInfoAsync(string accessToken);
 
     /// <summary>
     /// Get video analytics
     /// </summary>
-    Task<ServiceResult<TikTokAnalytics>> GetVideoAnalyticsAsync(
+    Task<ServiceResult<YouTubeAnalytics>> GetVideoAnalyticsAsync(
         string accessToken,
         string videoId);
 
     /// <summary>
-    /// Schedule video for later
+    /// Create playlist
     /// </summary>
-    Task<ServiceResult<string>> ScheduleVideoAsync(
+    Task<ServiceResult<string>> CreatePlaylistAsync(
         string accessToken,
-        string videoFilePath,
-        Post post,
-        DateTime scheduleTime);
+        string title,
+        string description);
 }
 
 /// <summary>
-/// TikTok creator information
+/// YouTube channel information
 /// </summary>
-public record TikTokCreator(
+public record YouTubeChannel(
     string Id,
-    string Username,
-    string DisplayName,
-    string AvatarLargeUrl,
-    int FollowerCount,
-    int FollowingCount,
+    string Title,
+    string Description,
+    string ThumbnailUrl,
+    int SubscriberCount,
     int VideoCount,
-    long LikeCount);
+    int ViewCount);
 
 /// <summary>
-/// TikTok video analytics
+/// YouTube video analytics
 /// </summary>
-public record TikTokAnalytics(
+public record YouTubeAnalytics(
     string VideoId,
     int Views,
     int Likes,
     int Comments,
     int Shares,
-    int Plays,
-    int Completes);
+    double AverageViewDuration,
+    double ClickThroughRate);
 
 /// <summary>
-/// Generic result wrapper - shared across services
+/// Generic result wrapper for service operations
 /// </summary>
 public record ServiceResult<T>(bool Success, T? Data, string? ErrorMessage, string? ErrorCode)
 {

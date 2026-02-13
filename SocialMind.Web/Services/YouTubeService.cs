@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
-namespace SocialMind.Web.Services.YouTube;
+namespace SocialMind.Web.Services;
 
 /// <summary>
 /// YouTube Data API v3 service implementation

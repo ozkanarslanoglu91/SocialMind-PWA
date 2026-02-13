@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SocialMind.Shared.Models;
 
-namespace SocialMind.Web.Services.TikTok;
+namespace SocialMind.Web.Services;
 
 /// <summary>
 /// TikTok Graph API v1 service implementation

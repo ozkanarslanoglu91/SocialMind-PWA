@@ -108,6 +108,12 @@ builder.Services.AddScoped<IOAuthService>(sp => sp.GetRequiredService<InstagramO
 // TODO: Add real Instagram Service after resolving namespace issues
 // builder.Services.AddScoped(typeof(SocialMind.Web.Services.Instagram.IInstagramService), ...);
 
+// TODO: Add YouTube and TikTok services after resolving DI registration
+// builder.Services.AddHttpClient<YouTubeService>();
+// builder.Services.AddScoped<IYouTubeService, YouTubeService>();
+// builder.Services.AddHttpClient<TikTokService>();
+// builder.Services.AddScoped<ITikTokService, TikTokService>();
+
 // Add Email Service
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 

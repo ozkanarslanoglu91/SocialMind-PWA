@@ -16,7 +16,7 @@ public class YouTubeServiceTests
     public YouTubeServiceTests()
     {
         _loggerMock = new Mock<ILogger<YouTubeService>>();
-        
+
         var mockHttpClientHandler = new Mock<HttpMessageHandler>();
         var httpClient = new HttpClient(mockHttpClientHandler.Object)
         {
@@ -279,7 +279,7 @@ public class YouTubeServiceTests
     {
         // Arrange
         var accessToken = "invalid_token";
-        
+
         var mockResponse = new HttpResponseMessage(HttpStatusCode.Unauthorized)
         {
             Content = new StringContent(@"{""error"": {""message"": ""Invalid token""}}")

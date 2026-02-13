@@ -1,14 +1,14 @@
 using SocialMind.Shared.Models;
 
-namespace SocialMind.Web.Services.YouTube;
+namespace SocialMind.Web.Services;
 
 /// <summary>
-/// YouTube Data API service interface
+/// TikTok API service interface
 /// </summary>
-public interface IYouTubeService
+public interface ITikTokService
 {
     /// <summary>
-    /// Upload video to YouTube
+    /// Upload video to TikTok
     /// </summary>
     Task<ServiceResult<Post>> UploadVideoAsync(
         string accessToken,
@@ -16,52 +16,54 @@ public interface IYouTubeService
         Post post);
 
     /// <summary>
-    /// Get YouTube channel info
+    /// Get TikTok creator info
     /// </summary>
-    Task<ServiceResult<YouTubeChannel>> GetChannelInfoAsync(string accessToken);
+    Task<ServiceResult<TikTokCreator>> GetCreatorInfoAsync(string accessToken);
 
     /// <summary>
     /// Get video analytics
     /// </summary>
-    Task<ServiceResult<YouTubeAnalytics>> GetVideoAnalyticsAsync(
+    Task<ServiceResult<TikTokAnalytics>> GetVideoAnalyticsAsync(
         string accessToken,
         string videoId);
 
     /// <summary>
-    /// Create playlist
+    /// Schedule video for later
     /// </summary>
-    Task<ServiceResult<string>> CreatePlaylistAsync(
+    Task<ServiceResult<string>> ScheduleVideoAsync(
         string accessToken,
-        string title,
-        string description);
+        string videoFilePath,
+        Post post,
+        DateTime scheduleTime);
 }
 
 /// <summary>
-/// YouTube channel information
+/// TikTok creator information
 /// </summary>
-public record YouTubeChannel(
+public record TikTokCreator(
     string Id,
-    string Title,
-    string Description,
-    string ThumbnailUrl,
-    int SubscriberCount,
+    string Username,
+    string DisplayName,
+    string AvatarLargeUrl,
+    int FollowerCount,
+    int FollowingCount,
     int VideoCount,
-    int ViewCount);
+    long LikeCount);
 
 /// <summary>
-/// YouTube video analytics
+/// TikTok video analytics
 /// </summary>
-public record YouTubeAnalytics(
+public record TikTokAnalytics(
     string VideoId,
     int Views,
     int Likes,
     int Comments,
     int Shares,
-    double AverageViewDuration,
-    double ClickThroughRate);
+    int Plays,
+    int Completes);
 
 /// <summary>
-/// Generic result wrapper for service operations
+/// Generic result wrapper - shared across services
 /// </summary>
 public record ServiceResult<T>(bool Success, T? Data, string? ErrorMessage, string? ErrorCode)
 {
