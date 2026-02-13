@@ -8,6 +8,11 @@ using SocialMind.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load secrets from environment variables or appsettings.secrets.json
+builder.Configuration
+    .AddJsonFile("appsettings.secrets.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables(prefix: "SOCIALMIND_");
+
 // Add Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -99,6 +104,9 @@ builder.Services.AddHttpClient<InstagramOAuthService>();
 builder.Services.AddHttpClient<YouTubeOAuthService>();
 builder.Services.AddHttpClient<TikTokOAuthService>();
 builder.Services.AddScoped<IOAuthService>(sp => sp.GetRequiredService<InstagramOAuthService>()); // Default
+
+// TODO: Add real Instagram Service after resolving namespace issues
+// builder.Services.AddScoped(typeof(SocialMind.Web.Services.Instagram.IInstagramService), ...);
 
 // Add Email Service
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
