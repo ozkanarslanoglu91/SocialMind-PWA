@@ -4,7 +4,7 @@ using Moq;
 using Xunit;
 using Microsoft.Extensions.Logging;
 using SocialMind.Shared.Models;
-using SocialMind.Web.Services.TikTok;
+using SocialMind.Web.Services;
 
 namespace SocialMind.Tests.Services.TikTok;
 
