@@ -130,9 +130,6 @@ builder.Services.AddControllers();
 // Re-enable when targeting supported platforms.
 
 
-    var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), includeControllerXmlComments: true);
-});
 
 // Add Cascade Authentication State
 builder.Services.AddCascadingAuthenticationState();
