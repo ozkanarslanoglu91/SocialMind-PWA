@@ -1,3 +1,34 @@
+# SocialMind — Local Development
+
+Quick start (Node-based frontend + API)
+
+Requirements:
+- Node.js 18+ (Node 24 used in CI here)
+- npm
+
+Installation:
+
+```bash
+npm ci
+# start frontend dev server
+npm run dev
+# start local Node API
+npm run dev:server
+```
+
+Endpoints:
+- Frontend: http://localhost:5173
+- API health: http://localhost:4000/api/health
+- AI generate: POST http://localhost:4000/api/ai/generate { prompt }
+- Social providers: GET http://localhost:4000/api/social/providers
+
+Configure environment variables in `.env` or your environment (example):
+
+```
+OPENAI_API_KEY=sk-...
+```
+
+PWA: built using `vite-plugin-pwa`; icons are in `/public` and `manifest.json` is configured.
 # 🌐 SocialMind - Hybrid Sosyal Medya Yönetim Platformu
 
 <div align="center">
