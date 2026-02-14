@@ -203,3 +203,6 @@ logs/
 .temp/
 
 .fake
+# Ignore build outputs
+SocialMind/SocialMind/bin/
+SocialMind/SocialMind/obj/
