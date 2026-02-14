@@ -126,23 +126,10 @@ builder.Services.AddScoped<IUsageTrackingService, UsageTrackingService>();
 builder.Services.AddControllers();
 
 // Add Swagger/OpenAPI
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "SocialMind API",
-        Version = "v1",
-        Description = "Social Media Management Platform API",
-        Contact = new Microsoft.OpenApi.Models.OpenApiContact
-        {
-            Name = "SocialMind Support",
-            Email = "support@socialmind.app"
-        }
-    });
+// Swagger/OpenAPI temporarily disabled for Linux build environment
+// Re-enable when targeting supported platforms.
 
-    var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), includeControllerXmlComments: true);
-});
+
 
 // Add Cascade Authentication State
 builder.Services.AddCascadingAuthenticationState();

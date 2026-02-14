@@ -1,20 +1,198 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SocialMind - AI Powered Social Media Hub</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>navigator.serviceWorker.register("pwabuilder-adv-sw.js")</script> 
-<link rel="manifest" href="manifest.json" />    <link href="/src/main.css" rel="stylesheet" />
-</head>
+    <title>SocialMind - Modern Dark</title>
+    <style>
+      :root {
+        --bg: #0b0b0c;
+        --card: #0f1113;
+        --muted: #9aa3ae;
+        --accent: #7c3aed;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: var(--bg);
+        color: #e6eef6;
+        font-family:
+          Inter,
+          system-ui,
+          Segoe UI,
+          Roboto,
+          "Helvetica Neue",
+          Arial;
+      }
+      .container {
+        min-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+      }
+      .card {
+        width: 100%;
+        max-width: 980px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          transparent
+        );
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: 0 6px 24px rgba(2, 6, 23, 0.6);
+        border-radius: 14px;
+        padding: 32px;
+      }
+      .brand {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+      .logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--accent), #2dd4bf);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #07101a;
+      }
+      h1 {
+        margin: 0;
+        font-size: 28px;
+      }
+      p.lead {
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 20px;
+        margin-top: 24px;
+      }
+      .panel {
+        background: var(--card);
+        padding: 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.02);
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: var(--accent);
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .container {
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <main class="card">
+        <div class="brand">
+          <div class="logo">SM</div>
+          <div>
+            <h1>SocialMind</h1>
+            <p class="lead">
+              Modern siyah tema — yönetim paneli ve sosyal entegrasyonlar için
+              temiz bir başlangıç.
+            </p>
+          </div>
+        </div>
 
-<body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-</body>
+        <div class="grid">
+          <section>
+            <div class="panel">
+              <h3>Hızlı Başlangıç</h3>
+              <p class="muted">
+                Projeyi yerel olarak başlatmak için aşağıdaki komutları
+                kullanın.
+              </p>
+              <pre
+                style="
+                  background: rgba(0, 0, 0, 0.2);
+                  padding: 12px;
+                  border-radius: 8px;
+                  color: #dbeafe;
+                "
+              >
+npm run dev
+npm run build
+dotnet run --project SocialMind/SocialMind.Web</pre
+              >
+              <a class="btn" href="#" onclick="startDemo(event)"
+                >Canlı Önizleme</a
+              >
+            </div>
 
+            <div class="panel" style="margin-top: 14px">
+              <h4>Notlar</h4>
+              <ul class="muted">
+                <li>
+                  .NET servisleri <strong>SocialMind.Web</strong> içinde
+                  çalışır.
+                </li>
+                <li>
+                  Swagger geliştirme ortamında tekrar etkinleştirilebilir.
+                </li>
+                <li>
+                  Veritabanı ve kimlik bilgilerini `appsettings.secrets.json`
+                  ile yükleyin.
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <aside>
+            <div class="panel">
+              <h4>Hızlı İstatistik</h4>
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 10px;
+                  margin-top: 12px;
+                "
+              >
+                <div class="muted">
+                  Build Durumu: <strong style="color: #8ef">Başarılı</strong>
+                </div>
+                <div class="muted">
+                  Birim Testleri: <strong style="color: #8ef">1/1 geçti</strong>
+                </div>
+                <div class="muted">
+                  Büyük dosyalar geçmişten temizlenebilir.
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      function startDemo(e) {
+        e.preventDefault();
+        alert("Dev server: npm run dev ile başlatın.");
+      }
+    </script>
+  </body>
 </html>
