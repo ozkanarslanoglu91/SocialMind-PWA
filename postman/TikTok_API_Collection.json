@@ -1,0 +1,361 @@
+{
+  "info": {
+    "name": "SocialMind TikTok API",
+    "description": "Complete TikTok API v2 integration for SocialMind project. Includes OAuth 2.0 flow, user profile, videos API, and video upload endpoints. App ID: 7600244017401530424",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "OAuth",
+      "description": "TikTok OAuth 2.0 Authentication Flow",
+      "item": [
+        {
+          "name": "1. Get Authorization URL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/social/tiktok/auth",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "social", "tiktok", "auth"]
+            },
+            "description": "Generate TikTok OAuth authorization URL with required scopes"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has auth_url\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.auth_url).to.be.a('string');",
+                  "    pm.expect(jsonData.state).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Exchange Code for Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/social/tiktok/callback?code={{authCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "social", "tiktok", "callback"],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "{{authCode}}",
+                  "description": "Authorization code from TikTok OAuth redirect"
+                }
+              ]
+            },
+            "description": "Exchange authorization code for access token"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Token exchange successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.access_token).to.be.a('string');",
+                  "    ",
+                  "    // Save tokens to environment",
+                  "    pm.environment.set('accessToken', jsonData.access_token);",
+                  "    pm.environment.set('refreshToken', jsonData.refresh_token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Refresh Access Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/social/tiktok/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "social", "tiktok", "refresh"]
+            },
+            "description": "Refresh expired access token using refresh token"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Token refresh successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.environment.set('accessToken', jsonData.access_token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Revoke Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"access_token\": \"{{accessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/social/tiktok/revoke",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "social", "tiktok", "revoke"]
+            },
+            "description": "Revoke access token (logout)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User API",
+      "description": "TikTok User Profile and Videos",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "TikTok access token"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/social/tiktok/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "social", "tiktok", "profile"]
+            },
+            "description": "Get authenticated user's profile information"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Profile retrieved successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.user).to.be.an('object');",
+                  "    pm.expect(jsonData.user.display_name).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User Videos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "TikTok access token"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/social/tiktok/videos?max_count=20&cursor=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "social", "tiktok", "videos"],
+              "query": [
+                {
+                  "key": "max_count",
+                  "value": "20",
+                  "description": "Number of videos to fetch (1-20)"
+                },
+                {
+                  "key": "cursor",
+                  "value": "0",
+                  "description": "Pagination cursor"
+                }
+              ]
+            },
+            "description": "Get authenticated user's uploaded videos"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Videos retrieved successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.videos).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Video Upload",
+      "description": "TikTok Video Upload and Publish",
+      "item": [
+        {
+          "name": "1. Initialize Upload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"video_size\": 5242880,\n  \"chunk_size\": 5242880,\n  \"total_chunk_count\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/social/tiktok/upload/init",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "social", "tiktok", "upload", "init"]
+            },
+            "description": "Initialize video upload session"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Upload initialized\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.upload_url).to.be.a('string');",
+                  "    pm.environment.set('uploadUrl', jsonData.upload_url);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Publish Video",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"post_info\": {\n    \"title\": \"My TikTok Video\",\n    \"privacy_level\": \"SELF_ONLY\",\n    \"disable_comment\": false,\n    \"disable_duet\": false,\n    \"disable_stitch\": false,\n    \"video_cover_timestamp_ms\": 1000\n  },\n  \"source_info\": {\n    \"source\": \"FILE_UPLOAD\",\n    \"video_url\": \"{{uploadUrl}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/social/tiktok/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "social", "tiktok", "publish"]
+            },
+            "description": "Publish uploaded video to TikTok"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Video published successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.publish_id).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Server health check endpoint"
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "socialmind-server",
+  "version": "1.0.0",
+  "description": "SocialMind API Server - Node.js backend for social media management",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch --env-file=../.env index.js",
+    "start": "node --env-file=../.env index.js",
+    "test": "node test-tiktok-auth.js"
+  },
+  "keywords": [
+    "social-media",
+    "api",
+    "tiktok",
+    "youtube",
+    "instagram"
+  ],
+  "author": "ultrarslanoglu",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,34 +1,122 @@
-# SocialMind — Local Development
+# SocialMind — Quick Start Guide
 
-Quick start (Node-based frontend + API)
+## 🚀 Local Development (Node.js + React)
 
-Requirements:
-- Node.js 18+ (Node 24 used in CI here)
-- npm
+### Requirements
+- Node.js 18+ (Node 24 recommended)
+- npm or pnpm
 
-Installation:
+### Quick Installation
 
 ```bash
+# Install frontend dependencies
 npm ci
-# start frontend dev server
+
+# Install server dependencies
+cd server
+npm install
+cd ..
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env and add your TikTok API credentials
+```
+
+### Start Development Servers
+
+**Terminal 1 - Frontend:**
+```bash
 npm run dev
-# start local Node API
-npm run dev:server
+# Runs on: http://localhost:5000
 ```
 
-Endpoints:
-- Frontend: http://localhost:5173
-- API health: http://localhost:4000/api/health
-- AI generate: POST http://localhost:4000/api/ai/generate { prompt }
-- Social providers: GET http://localhost:4000/api/social/providers
-
-Configure environment variables in `.env` or your environment (example):
-
+**Terminal 2 - Backend API:**
+```bash
+cd server
+npm run dev
+# Runs on: http://localhost:4000
 ```
+
+### 🎯 Available Endpoints
+
+#### Health & Status
+- `GET http://localhost:4000/api/health` - Server health check
+- `GET http://localhost:4000/api/social/providers` - List of supported platforms
+
+#### AI Content Generation
+- `POST http://localhost:4000/api/ai/generate` - Generate AI content
+  ```json
+  { "prompt": "Your prompt here" }
+  ```
+
+#### TikTok API (New! ✨)
+- `GET /api/social/tiktok/auth` - Start OAuth flow
+- `GET /api/social/tiktok/callback?code=...` - OAuth callback
+- `POST /api/social/tiktok/refresh` - Refresh access token
+- `GET /api/social/tiktok/profile` - Get user profile (requires Bearer token)
+- `GET /api/social/tiktok/videos` - Get user videos
+- `POST /api/social/tiktok/upload/init` - Initialize video upload
+- `POST /api/social/tiktok/publish` - Publish video
+- `POST /api/social/tiktok/revoke` - Revoke access token
+
+### 🎬 TikTok Setup
+
+1. **Get TikTok API Credentials:**
+   - Visit: https://developers.tiktok.com/app/7600244017401530424
+   - Copy Client Key and Client Secret
+   - Add Redirect URI: `http://localhost:5000/auth/tiktok/callback`
+
+2. **Configure .env file:**
+   ```env
+   TIKTOK_CLIENT_KEY=your_client_key_here
+   TIKTOK_CLIENT_SECRET=your_client_secret_here
+   TIKTOK_REDIRECT_URI=http://localhost:5000/auth/tiktok/callback
+   ```
+
+3. **Test the integration:**
+   ```bash
+   cd server
+   npm test
+   ```
+
+4. **Use in browser:**
+   - Open http://localhost:5000
+   - Navigate to TikTok tab
+   - Click "Connect TikTok Account"
+   - Authenticate and see your profile!
+
+### 📚 Documentation
+
+- [TikTok Setup Guide](docs/TIKTOK_SETUP.md) - Complete setup instructions
+- [TikTok Testing Guide](docs/TIKTOK_TESTING.md) - Testing endpoints and troubleshooting
+
+### 🔧 Environment Variables
+
+Example `.env` configuration:
+
+```env
+# Server
+PORT=4000
+NODE_ENV=development
+
+# OpenAI (optional)
 OPENAI_API_KEY=sk-...
+
+# TikTok API (required for TikTok features)
+TIKTOK_CLIENT_KEY=your_client_key
+TIKTOK_CLIENT_SECRET=your_client_secret
+TIKTOK_REDIRECT_URI=http://localhost:5173/auth/tiktok/callback
 ```
 
-PWA: built using `vite-plugin-pwa`; icons are in `/public` and `manifest.json` is configured.
+### 🎨 App Features
+
+- ✅ Progressive Web App (PWA) with offline support
+- ✅ TikTok OAuth integration with video management
+- ✅ AI-powered content generation
+- ✅ Multi-platform social media dashboard
+- ✅ Real-time analytics and scheduling
+
+---
 # 🌐 SocialMind - Hybrid Sosyal Medya Yönetim Platformu
 
 <div align="center">
@@ -72,11 +160,29 @@ SocialMind, **YouTube, TikTok, Instagram, Facebook, Twitter/X ve LinkedIn** gibi
 ### 📱 Desteklenen Platformlar
 
 - ✅ **YouTube** - OAuth ile tam entegrasyon
-- ✅ **TikTok** - Video paylaşımı ve analitik
+- ✅ **TikTok** - ⭐ **YENİ!** OAuth 2.0, video upload/publish, user profile & videos API
 - ✅ **Instagram** - Görsel içerik yönetimi
 - ✅ **Facebook** - Sayfa ve grup yönetimi
 - ✅ **Twitter/X** - Tweet ve thread oluşturma
 - ✅ **LinkedIn** - Profesyonel içerik paylaşımı
+
+#### 🎬 TikTok Entegrasyonu (App ID: 7600244017401530424)
+
+**Implemented Features:**
+- ✅ OAuth 2.0 Authorization Flow (Login Kit)
+- ✅ Access Token Management (with auto-refresh)
+- ✅ User Profile API (followers, following, videos, likes count)
+- ✅ User Videos API (with pagination)
+- ✅ Video Upload API (chunked upload for large files)
+- ✅ Video Publish API
+- ✅ Token Revocation
+- ✅ React Component with UI (profile display, video grid)
+
+**Tech Stack:**
+- Backend: Node.js + Express (8 endpoints)
+- Frontend: React + TypeScript (TikTokClient service)
+- Storage: localStorage (token persistence)
+- API: TikTok API v2 (open.tiktokapis.com)
 
 ### 🤖 AI Model Desteği
 
