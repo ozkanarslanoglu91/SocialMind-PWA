@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<maui:MauiWinUIWindow
+    x:Class="SocialMind.WinUI.App"
+    xmlns:maui="using:Microsoft.Maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid RowDefinitions="Auto,*">
+        <Frame Padding="12"
+                CornerRadius="8"
+                HasShadow="True">
+            <Label Text="SocialMind - AI Social Media Manager"
+                    FontSize="16"
+                    FontAttributes="Bold"/>
+        </Frame>
+    </Grid>
+
+</maui:MauiWinUIWindow>

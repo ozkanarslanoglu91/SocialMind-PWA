@@ -1,0 +1,6 @@
+namespace SocialMind;
+
+public partial class Platforms
+{
+	// Platform-specific code
+}

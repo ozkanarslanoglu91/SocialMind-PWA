@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SocialMind.Views.DashboardPage"
+             Title="Dashboard"
+             BackgroundColor="#F5F5F5">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            
+            <!-- Header -->
+            <Label Text="📊 Dashboard" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   TextColor="#2563eb"/>
+
+            <!-- Stats Grid -->
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                <Frame Grid.Row="0" Grid.Column="0" Padding="15" CornerRadius="10" HasShadow="True">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Total Posts" FontSize="12" TextColor="#666"/>
+                        <Label Text="{Binding TotalPosts}" FontSize="20" FontAttributes="Bold" TextColor="#2563eb"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="0" Grid.Column="1" Padding="15" CornerRadius="10" HasShadow="True">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Followers" FontSize="12" TextColor="#666"/>
+                        <Label Text="{Binding TotalFollowers}" FontSize="20" FontAttributes="Bold" TextColor="#7c3aed"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Padding="15" CornerRadius="10" HasShadow="True">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Engagement Rate" FontSize="12" TextColor="#666"/>
+                        <Label Text="{Binding EngagementRate, StringFormat='{0:F2}%'}" FontSize="20" FontAttributes="Bold" TextColor="#06b6d4"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- Connected Accounts -->
+            <Label Text="Connected Accounts" FontSize="14" FontAttributes="Bold" TextColor="#2563eb"/>
+            <CollectionView ItemsSource="{Binding ConnectedAccounts}" SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="15" CornerRadius="10" HasShadow="True" Margin="0,5">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                <Label Grid.Row="0" Grid.Column="0" Text="{Binding Platform}" FontAttributes="Bold"/>
+                                <Label Grid.Row="1" Grid.Column="0" Text="{Binding Username}" FontSize="12" TextColor="#666"/>
+                                <Label Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Text="{Binding Followers}" FontAttributes="Bold" TextColor="#2563eb" VerticalOptions="Center"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Recent Posts -->
+            <Label Text="Recent Posts" FontSize="14" FontAttributes="Bold" TextColor="#2563eb"/>
+            <CollectionView ItemsSource="{Binding RecentPosts}" SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="15" CornerRadius="10" HasShadow="True" Margin="0,5">
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="{Binding Content}" FontSize="12" LineBreakMode="WordWrap"/>
+                                <Label Text="{Binding CreatedAt, StringFormat='Posted: {0:g}'}" FontSize="10" TextColor="#999"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="#2563eb"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

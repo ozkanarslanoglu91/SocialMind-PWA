@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SocialMind.Views.CreatePostPage"
+             Title="Create Post"
+             BackgroundColor="#F5F5F5">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Label Text="✍️ Create New Post" FontSize="24" FontAttributes="Bold" TextColor="#2563eb"/>
+
+            <!-- Post Content -->
+            <Label Text="Content" FontSize="12" FontAttributes="Bold" TextColor="#666"/>
+            <Editor Text="{Binding PostContent}" 
+                    Placeholder="Write your post here..." 
+                    HeightRequest="150" 
+                    BackgroundColor="#fff"
+                    BorderColor="#e0e0e0"
+                    BorderWidth="1"
+                    CornerRadius="8"/>
+
+            <!-- Platform Selection -->
+            <Label Text="Platforms" FontSize="12" FontAttributes="Bold" TextColor="#666"/>
+            <StackLayout Orientation="Horizontal" Spacing="10">
+                <CheckBox IsChecked="{Binding SelectedPlatforms, Converter={StaticResource InvertedBoolConverter}}" />
+                <Label Text="Twitter" VerticalOptions="Center"/>
+            </StackLayout>
+
+            <!-- AI Generation -->
+            <Button Text="🤖 Generate with AI" 
+                    Command="{Binding GenerateAIContentCommand}"
+                    IsEnabled="{Binding IsGenerating, Converter={StaticResource InvertedBoolConverter}}"/>
+
+            <!-- AI Suggestions -->
+            <Label Text="AI Suggestions" FontSize="12" FontAttributes="Bold" TextColor="#666" IsVisible="{Binding AiSuggestions.Count}"/>
+            <CollectionView ItemsSource="{Binding AiSuggestions}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="10" CornerRadius="8" Margin="0,5" BackgroundColor="#f0f4ff">
+                            <Label Text="{Binding .}" FontSize="12" LineBreakMode="WordWrap"/>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Suggested Hashtags -->
+            <Label Text="Suggested Hashtags" FontSize="12" FontAttributes="Bold" TextColor="#666" IsVisible="{Binding SuggestedHashtags.Count}"/>
+            <CollectionView ItemsSource="{Binding SuggestedHashtags}" SelectionMode="Multiple">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="8,4" CornerRadius="6" BackgroundColor="#e0e7ff" Margin="2">
+                            <Label Text="{Binding .}" FontSize="11" TextColor="#4f46e5"/>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Publish Button -->
+            <Button Text="📤 Publish" 
+                    Command="{Binding PublishPostCommand}"
+                    IsEnabled="{Binding IsGenerating, Converter={StaticResource InvertedBoolConverter}}"/>
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsGenerating}" IsVisible="{Binding IsGenerating}" Color="#2563eb"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
