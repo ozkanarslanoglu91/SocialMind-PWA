@@ -206,3 +206,16 @@ logs/
 # Ignore build outputs
 SocialMind/SocialMind/bin/
 SocialMind/SocialMind/obj/
+
+# Vite/Build
+dist/
+.vite/
+*.local
+
+# Vitest
+coverage/
+.nyc_output/
+
+# Package managers
+pnpm-lock.yaml
+yarn.lock
