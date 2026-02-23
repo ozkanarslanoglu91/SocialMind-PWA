@@ -1,0 +1,58 @@
+{
+  "name": "socialmind-pwa",
+  "version": "1.0.0",
+  "description": "AI-powered social media management Progressive Web Application",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "vite --open",
+    "build": "vite build && npm run build:sw",
+    "build:sw": "echo 'Service Worker is copied to dist/'",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.22.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "@types/react": "^18.2.56",
+    "@types/react-dom": "^18.2.19",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.57.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.1",
+    "vitest": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
+  },
+  "keywords": [
+    "pwa",
+    "social-media",
+    "ai",
+    "tiktok",
+    "youtube",
+    "instagram",
+    "progressive-web-app"
+  ],
+  "author": "ultrarslanoglu91",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ozkanarslanoglu91/SocialMind-PWA.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ozkanarslanoglu91/SocialMind-PWA/issues"
+  },
+  "homepage": "https://github.com/ozkanarslanoglu91/SocialMind-PWA#readme"
+}
